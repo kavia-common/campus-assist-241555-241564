@@ -1,18 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import 'package:campus_helper_frontend/main.dart';
 
 void main() {
-  testWidgets('App generation message displayed', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+  testWidgets('App loads and shows CGPA screen by default', (WidgetTester tester) async {
+    await tester.pumpWidget(const CampusHelperApp());
 
-    expect(find.text('campus_helper_frontend App is being generated...'), findsOneWidget);
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    // First pump triggers async store initialization; allow it to settle.
+    await tester.pumpAndSettle();
+
+    expect(find.text('CGPA Calculator'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.text('Calculate'), findsOneWidget);
   });
 
-  testWidgets('App bar has correct title', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Bottom navigation switches between calculators', (WidgetTester tester) async {
+    await tester.pumpWidget(const CampusHelperApp());
+    await tester.pumpAndSettle();
 
-    expect(find.text('campus_helper_frontend'), findsOneWidget);
+    // Attendance tab.
+    await tester.tap(find.text('Attendance'));
+    await tester.pumpAndSettle();
+    expect(find.text('Attendance'), findsOneWidget);
+
+    // Internals tab.
+    await tester.tap(find.text('Internals'));
+    await tester.pumpAndSettle();
+    expect(find.text('Internal Marks'), findsOneWidget);
+
+    // Back to CGPA.
+    await tester.tap(find.text('CGPA'));
+    await tester.pumpAndSettle();
+    expect(find.text('CGPA Calculator'), findsOneWidget);
   });
 }
